@@ -351,6 +351,26 @@ services:
       - elasticsearch
     profiles:
       - kibana
+  app:
+    image: node:20
+    container_name: app
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    networks:
+      - camunda-platform
+    volumes:
+      - /root/camunda-platform/resources:/resources
+    depends_on:
+      - zeebe
+    environment: # https://docs.camunda.io/docs/self-managed/operate-deployment/configuration/
+      - CAMUNDA_OPERATE_ZEEBE_GATEWAYADDRESS=zeebe:26500
+      - ZEEBE_CLIENT_ID=${ZEEBE_CLIENT_ID}
+      - ZEEBE_CLIENT_SECRET=${ZEEBE_CLIENT_SECRET}
+      - ZEEBE_TOKEN_AUDIENCE=zeebe-api
+      - ZEEBE_INSECURE_CONNECTION=true
+      - ZEEBE_AUTHORIZATION_SERVER_URL=http://keycloak:8080/auth/realms/camunda-platform/protocol/openid-connect/token
+      - ZEEBE_CLIENT_CONFIG_PATH=/tmp/zeebe_auth_cache
+      - ZEEBE_ADDRESS=zeebe:26500
 
 volumes:
   zeebe:
